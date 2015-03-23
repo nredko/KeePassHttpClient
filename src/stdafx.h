@@ -10,7 +10,6 @@
 #include <stdio.h>
 #include <tchar.h>
 
-// TODO: reference additional headers your program requires here
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
 #include <curl/curl.h>

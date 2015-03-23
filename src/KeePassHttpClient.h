@@ -11,26 +11,30 @@ typedef std::basic_string<TCHAR> tstring;
 
 class KeePassHttpClient
 {
+public:
+	KeePassHttpClient(tstring Url, tstring Id, tstring Key);
+	KeePassHttpClient(tstring Settings);
+	tstring Settings();
+	~KeePassHttpClient();
+	Json::Value GetLogins(tstring Url, tstring SubmitUrl);
 private:
 	CURL *curl;
 	tstring url = "";
 	tstring id = "";
 	tstring key = "";
 	tstring iv = "";
+	tstring hash = "";
 
 	std::vector<uint8_t> Generate(size_t size);
 	std::vector<uint8_t> Encrypt(std::vector<uint8_t> in);
 	std::vector<uint8_t> Decrypt(std::vector<uint8_t> in);
-	std::vector<uint8_t> Encrypt1(std::vector<uint8_t> in);
-	std::vector<uint8_t> Decrypt1(std::vector<uint8_t> in);
+	tstring Encrypt(tstring in, bool base64 = false);
+	tstring Decrypt(tstring in, bool base64 = false);
+	void Init();
 	Json::Value Post(Json::Value data);
-	bool Associate();
-public:
-	KeePassHttpClient(tstring Url, tstring Id, tstring Key);
-	~KeePassHttpClient();
-	tstring GetKey();
-	tstring GetId();
-	tstring Encrypt(tstring in, bool base64 = true);
-	tstring Decrypt(tstring in, bool base64 = true);
+
+	void TestAssociate();
+	void Associate();
+
 };
 
