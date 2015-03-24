@@ -555,7 +555,7 @@ void unpadBytesOut(std::vector<uint8_t>& data) {
 	size_t padCount = 0;
 	int8_t padByte = -1;
 	size_t  blockSize = 16;
-	for (int i = data.size() - 1; i > data.size() - blockSize; i--) {
+	for (size_t i = data.size() - 1; i > data.size() - blockSize; i--) {
 		if (data[i] <= blockSize) {
 			if (padByte == -1)
 				padByte = data[i];
