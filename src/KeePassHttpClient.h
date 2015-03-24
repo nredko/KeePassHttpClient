@@ -27,9 +27,9 @@ private:
 
 	std::vector<uint8_t> Generate(size_t size);
 	std::vector<uint8_t> Encrypt(std::vector<uint8_t> in);
-	std::vector<uint8_t> Decrypt(std::vector<uint8_t> in);
-	tstring Encrypt(tstring in, bool base64 = false);
-	tstring Decrypt(tstring in, bool base64 = false);
+	std::vector<uint8_t> Decrypt(std::vector<uint8_t> in, std::vector<uint8_t> rIv);
+	tstring Encrypt(tstring in);
+	tstring Decrypt(tstring in, tstring rIv);
 	void Init();
 	Json::Value Post(Json::Value data);
 

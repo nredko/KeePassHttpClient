@@ -180,48 +180,34 @@ Json::Value KeePassHttpClient::GetLogins(tstring Url, tstring SubmitUrl){
 	req["Nonce"] = iv;
 	req["Verifier"] = Encrypt(iv);
 	Json::Value ret = Post(req);
+	for (size_t i = 0; i < ret["Entries"].size(); i++){
+		ret["Entries"][i]["Name"] = Decrypt(ret["Entries"][i]["Name"].asString(), ret["Nonce"].asString());
+		ret["Entries"][i]["Password"] = Decrypt(ret["Entries"][i]["Password"].asString(), ret["Nonce"].asString());
+		ret["Entries"][i]["Uuid"] = Decrypt(ret["Entries"][i]["Uuid"].asString(), ret["Nonce"].asString());
+		ret["Entries"][i]["Login"] = Decrypt(ret["Entries"][i]["Login"].asString(), ret["Nonce"].asString());
+	}
 	return ret["Entries"];
 }
 
 std::vector<uint8_t> KeePassHttpClient::Encrypt(std::vector<uint8_t> in){
-	std::vector<uint8_t>keyBytes = Base64::Decode(key);
-	std::vector<uint8_t>ivBytes = Base64::Decode(iv);
-	std::vector<uint8_t> out;
-	out = encrypt(in, CBC, keyBytes, ivBytes);
-	return out;
+	return encrypt(in, CBC, Base64::Decode(key), Base64::Decode(iv));
 }
 
-std::vector<uint8_t> KeePassHttpClient::Decrypt(std::vector<uint8_t> in){
-	std::vector<uint8_t>keyBytes = Base64::Decode(key);
-	std::vector<uint8_t>ivBytes = Base64::Decode(iv);
-	std::vector<uint8_t> out;
-	out = decrypt(in, CBC, keyBytes, ivBytes);
-	return out;
+std::vector<uint8_t> KeePassHttpClient::Decrypt(std::vector<uint8_t> in, std::vector<uint8_t>ivBytes){
+	return decrypt(in, CBC, Base64::Decode(key), ivBytes);
 }
 
 
-tstring KeePassHttpClient::Encrypt(tstring in, bool base64){
+tstring KeePassHttpClient::Encrypt(tstring in){
 	std::vector<uint8_t> inBytes;
-	if (base64){
-		tstring inStr = Base64::Encode(in);
-		inBytes.assign(inStr.data(), inStr.data() + (inStr.size()*sizeof(TCHAR)));
-	}
-	else
-		inBytes.assign(in.data(), in.data() + (in.size()*sizeof(TCHAR)));
+	inBytes.assign(in.data(), in.data() + (in.size()*sizeof(TCHAR)));
 	std::vector<uint8_t>  out = Encrypt(inBytes);
 	return Base64::Encode(out);
 }
 
-tstring KeePassHttpClient::Decrypt(tstring in, bool base64){
-	std::vector<uint8_t> inBytes;
-	if (base64)
-		inBytes = Base64::Decode(in);
-	else
-		inBytes.assign(in.data(), in.data() + (in.size()*sizeof(TCHAR)));
-	std::vector<uint8_t>  out = Decrypt(inBytes);
+tstring KeePassHttpClient::Decrypt(tstring in, tstring rIv){
+	std::vector<uint8_t>  out = Decrypt(Base64::Decode(in), Base64::Decode(rIv));
 	out.push_back(0);
 	tstring outStr = tstring(reinterpret_cast<const TCHAR*>(out.data()));
-	if (base64)
-		return Base64::DecodeStr(outStr);
 	return outStr;
 }
