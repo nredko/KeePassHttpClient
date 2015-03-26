@@ -12,14 +12,16 @@ typedef std::basic_string<TCHAR> tstring;
 class KeePassHttpClient
 {
 public:
-	KeePassHttpClient(tstring Url, tstring Id, tstring Key);
+	KeePassHttpClient(tstring Port, tstring Id, tstring Key);
 	KeePassHttpClient(tstring Settings);
 	tstring Settings();
 	~KeePassHttpClient();
 	Json::Value GetLogins(tstring Url, tstring SubmitUrl);
 private:
+#ifdef CURL_STATICLIB
 	CURL *curl;
-	tstring url = "";
+#endif
+	tstring port = "";
 	tstring id = "";
 	tstring key = "";
 	tstring iv = "";
